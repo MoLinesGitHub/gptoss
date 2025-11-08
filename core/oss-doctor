@@ -1,0 +1,90 @@
+#!/bin/bash
+# ============================================================
+#  GPT-OSS Doctor — Auditoría de entorno completa
+# ============================================================
+
+CONF="$HOME/Documents/Scripts/gptoss/config/gptoss.conf"
+COLOR_OK="\033[92m"; COLOR_WARN="\033[33m"; COLOR_ERR="\033[31m"; NC="\033[0m"
+ok(){ echo -e "${COLOR_OK}✓${NC} $1"; }
+warn(){ echo -e "${COLOR_WARN}⚠️  $1${NC}"; }
+fail(){ echo -e "${COLOR_ERR}✗ $1${NC}"; }
+
+echo -e "\n🧠 GPT-OSS Doctor — Diagnóstico general\n────────────────────────────────────────────"
+
+# --- 1. Configuración base ---
+[ -f "$CONF" ] && ok "Archivo de configuración encontrado: $CONF" || fail "No se encontró gptoss.conf"
+
+# --- 2. Carga de parámetros críticos ---
+PROJECT_PATH=$(grep -E '^DEFAULT_PROJECT_PATH=' "$CONF" | sed 's/^.*=//;s/"//g')
+BUILD_LOG=$(grep -E '^BUILD_LOG=' "$CONF" | sed 's/^.*=//;s/"//g')
+SECURITY_MAP=$(grep -E '^SECURITY_MAP_PATH=' "$CONF" | sed 's/^.*=//;s/"//g')
+OLLAMA_DIR=$(grep -E '^OLLAMA_MODELS_DIR=' "$CONF" | sed 's/^.*=//;s/"//g')
+BACKUP_DIR=$(grep -E '^BACKUP_DIR=' "$CONF" | sed 's/^.*=//;s/"//g')
+NAS_IP=$(grep -E '^NAS_TAILSCALE_IP=' "$CONF" | cut -d'"' -f2)
+
+# --- 3. Verificaciones de rutas ---
+[ -d "$PROJECT_PATH" ] && ok "Ruta del proyecto Xcode OK" || fail "Ruta de proyecto inválida"
+[ -d "$OLLAMA_DIR" ] && ok "Directorio de modelos Ollama OK" || warn "Modelos Ollama no encontrados"
+[ -d "$BACKUP_DIR" ] && ok "Carpeta de backups OK" || warn "Carpeta de backups no existe"
+[ -f "$SECURITY_MAP" ] && ok "Mapa de seguridad cargado" || fail "security.map no encontrado"
+[ -d "$(dirname "$BUILD_LOG")" ] && ok "Carpeta de logs presente" || warn "Faltan logs"
+
+# --- 4. Xcode ---
+XCODE_BIN=$(grep -E '^XCODE_PATH=' "$CONF" | sed 's/^.*=//;s/"//g')
+if [ -x "$XCODE_BIN" ]; then
+  VERSION=$($XCODE_BIN -version | head -n1)
+  ok "Xcode detectado → $VERSION"
+else
+  fail "Xcode no localizado en $XCODE_BIN"
+fi
+
+# --- 5. Ollama ---
+if command -v ollama >/dev/null 2>&1; then
+  VERSION=$(ollama --version 2>/dev/null)
+  ok "Ollama instalado → $VERSION"
+else
+  warn "Ollama no instalado o no está en PATH"
+fi
+
+# --- 6. NAS / Tailscale ---
+ping -c1 -t2 "$NAS_IP" &>/dev/null && ok "NAS Tailscale ($NAS_IP) accesible" || warn "NAS no responde vía Tailscale"
+
+# --- 7. Seguridad ---
+grep -q "SAFE_MODE=on" "$CONF" && ok "SAFE_MODE activo" || warn "SAFE_MODE desactivado"
+grep -q "SIGNED_MODULES_ONLY=true" "$CONF" && ok "Módulos firmados requeridos" || warn "Firmas no obligatorias"
+grep -q "CHECKSUM_VERIFY=true" "$CONF" && ok "Verificación de integridad habilitada" || warn "Checksum deshabilitado"
+
+# --- 8. Backups / Logs ---
+if [ -n "$BACKUP_DIR" ]; then
+  COUNT=$(find "$BACKUP_DIR" -type f -mtime -7 2>/dev/null | wc -l | tr -d ' ')
+  [ "$COUNT" -gt 0 ] && ok "Backups recientes detectados ($COUNT archivos)" || warn "No hay backups recientes"
+fi
+
+# --- 9. Home Assistant ---
+grep -q "HOME_ASSISTANT_ENABLED=true" "$CONF" && ok "Home Assistant activo" || warn "Home Assistant desactivado"
+
+# --- 10. Informe final ---
+echo -e "\n────────────────────────────────────────────"
+echo -e "🔍 Auditoría completada a las $(date '+%Y-%m-%d %H:%M:%S')"
+echo -e "Resultados detallados en: ${BUILD_LOG:-$LOG_DIR/doctor.log}\n"
+
+# --- 11. Verificación de integridad (SHA256) ---
+if [ -f "$SECURITY_MAP" ]; then
+  echo -e "🧮 Verificando integridad del mapa de seguridad..."
+  HASH_NOW=$(shasum -a 256 "$SECURITY_MAP" | awk '{print $1}')
+  HASH_FILE="$HOME/Documents/Scripts/gptoss/config/.security_hash"
+
+  if [ -f "$HASH_FILE" ]; then
+    HASH_OLD=$(cat "$HASH_FILE")
+    if [ "$HASH_NOW" = "$HASH_OLD" ]; then
+      ok "Integridad del security.map verificada (SHA256 coincide)"
+    else
+      fail "⚠️  El archivo security.map ha sido modificado desde la última auditoría"
+    fi
+  else
+    echo "$HASH_NOW" > "$HASH_FILE"
+    ok "Hash SHA256 inicial registrado para futuras auditorías"
+  fi
+else
+  warn "No se pudo verificar integridad: security.map no encontrado"
+fi

@@ -1,0 +1,175 @@
+# ============================================================
+#   GPT-OSS Neural Shell — Configuración Ultra Avanzada v7.2
+#   Control total de entorno, contexto, energía y automatización
+# ============================================================
+
+# --- Core LLM Settings ---
+MODEL="qwen2.5-coder:14b"
+TEMPERATURE=0.35
+LANGUAGE="es"
+CONTEXT_LIMIT=32000                # tokens máximos de contexto por sesión
+MEMORY_MODE=adaptive               # opciones: flat | hierarchical | adaptive
+
+# --- Logging & Memory ---
+LOG_DIR="$HOME/Documents/Scripts/logs"
+MEMORY_FILE="$HOME/Documents/Scripts/gptoss/data/memory.json"
+AUTO_BACKUP=true
+BACKUP_DIR="$HOME/Documents/Scripts/gptoss/backups"
+BACKUP_RETENTION_DAYS=10           # purga backups antiguos automáticamente
+LOG_ROTATE_SIZE=5M                 # rotación de logs grandes
+
+# --- Git & Updater ---
+REPO_URL="https://github.com/MoLinesGitHub/gptoss.git"
+AUTO_UPDATE=check
+ALLOW_GIT_PUSH=true
+SAFE_MODE=on
+GIT_BRANCH="main"
+CHANGELOG_ON_UPDATE=true           # muestra commits nuevos tras actualización
+AUTO_MERGE_CONFLICTS=smart         # intenta resolver conflictos simples automáticamente
+
+# --- Xcode & Build System ---
+DEFAULT_PROJECT_PATH="/Volumes/SSD/xCode_Projects/Cortes/iOS_Cortes"
+DEFAULT_SCHEME="Cortes"
+DEFAULT_SIMULATOR="iPhone 17 Pro, iOS 26.1"
+XCODE_PATH="/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild"
+AUTO_COMPILE=true
+AUTO_TEST=true
+BUILD_LOG="$HOME/Documents/Scripts/logs/build.log"
+PARALLEL_BUILDS=2                  # permite compilaciones simultáneas
+POST_BUILD_SCRIPT="$HOME/Documents/Scripts/gptoss/hooks/post_build.sh"
+
+# --- Ollama & AI Extensions ---
+ENABLE_LOCAL_AI=true
+ENABLE_API_AI=true
+OLLAMA_MODELS_DIR="/Volumes/SSD/Cerebro/LLM_Models/ollama"
+OLLAMA_DEFAULT_MODEL="llama3"
+OLLAMA_FALLBACK_MODEL="deepseek-coder"
+AI_TIMEOUT=180                     # segundos máximos por petición
+AI_CONTEXT_PERSIST=true            # conserva contexto entre sesiones
+API_FAILOVER_ORDER="local,api"     # prioridad de ejecución (usa local si disponible)
+
+# --- Voice & Notifications ---
+VOICE_DEFAULT="Jorge"
+VOICE_ENABLED=true
+VOICE_MODE=summary
+VOICE_CHARS=180
+NOTIFY_LEVEL=verbose
+SOUND_ALERTS=true
+ALERT_SOUND="/System/Library/Sounds/Submarine.aiff"
+
+# --- Dashboard & UI ---
+DASHBOARD_THEME="#00ffee"
+SHOW_SYSTEM_BANNER=true
+SHOW_USAGE_STATS=true
+DASHBOARD_REFRESH_INTERVAL=2s
+TERMINAL_WIDTH=120
+TERMINAL_STYLE=clear-dark
+
+# --- Security ---
+CHECKSUM_VERIFY=true
+ENCRYPT_MEMORY=true
+SECURITY_AUDIT_INTERVAL=daily
+SECURITY_ALERT_EMAIL="admin@molinesdesigns.com"
+FIREWALL_ENFORCE=true              # bloquea conexiones no autorizadas
+BLOCKED_COMMANDS="rm -rf,shutdown,reboot"
+
+# --- Network & Nodes ---
+TAILSCALE_ENABLED=true
+TAILSCALE_IP="100.100.3.33"
+NAS_IP="192.168.3.33"
+PI_IP="192.168.3.34"
+SYNC_WITH_NAS=true
+SYNC_INTERVAL=30m
+REMOTE_BACKUP_PATH="tailscale://100.100.3.33:/volume1/backups/gptoss"
+
+# --- Energy & Performance ---
+ENERGY_MODE=balanced               # opciones: performance | balanced | low-power
+CPU_LIMIT=90                       # límite de CPU en % antes de throttling
+THERMAL_WATCHDOG=true              # reduce carga si temperatura excede 85 °C
+
+# --- Developer QoL ---
+EDITOR="code"
+AUTO_RESTART_ON_CRASH=true
+VERBOSE_LOGGING=false
+SESSION_TIMEOUT=7200               # tiempo máx de sesión antes de reinicio automático
+ALIAS_REFRESH_INTERVAL=12h         # regenera alias automáticamente cada 12 horas
+
+# ============================================================
+#   GPT-OSS Neural Shell — Extensión v8.0
+#   Modo autónomo, contexto adaptativo, y red distribuida
+# ============================================================
+
+# --- Self Diagnostics ---
+SELF_DIAG_ENABLED=true
+SELF_REPAIR_MODE=smart            # off | manual | smart | aggressive
+HEALTH_CHECK_INTERVAL=10m
+LOG_INTEGRITY_MONITOR=true
+CRASH_DUMP_DIR="$HOME/Documents/Scripts/gptoss/crashlogs"
+
+# --- Context Awareness ---
+AWARE_MODE=adaptive               # ajusta temperatura, energía y logging según tarea
+CONTEXT_TAGS="swift,xcode,infra,voice"
+INTELLIGENT_MODE_SWITCH=true
+ACTIVITY_TIMEOUT=5m               # suspende voz/IA tras inactividad
+
+# --- Code Integrity ---
+SIGNED_MODULES_ONLY=true
+AUTHORIZED_KEYS="$HOME/.gptoss/authorized_keys"
+AUTO_SIGN_ON_PUSH=true            # firma commits locales automáticamente
+
+# --- Multi-Node Sync ---
+CLUSTER_MODE=enabled
+CLUSTER_NODES="macmini:192.168.3.10,nas:192.168.3.33,pi:192.168.3.34"
+SYNC_STRATEGY="delta"             # sincroniza solo archivos modificados
+SYNC_PROTOCOL="tailscale+rsync"
+REMOTE_METRICS=true               # obtiene CPU/RAM de cada nodo
+
+# --- AI Orchestration ---
+ENABLE_AGENT_SCHEDULER=true
+AGENT_PRIORITY_ORDER="swift_expert,builder_agent,ux_agent"
+COGNITIVE_CACHE="$HOME/Documents/Scripts/gptoss/cache"
+CACHE_TTL=24h
+PARALLEL_AGENTS=true
+MCP_BRIDGE_ENABLED=true           # conecta con Claude MCP local si disponible
+
+# --- Performance Scaling ---
+DYNAMIC_CPU_SCALING=true
+THERMAL_THROTTLE_LEVEL=85
+AUTO_COOLDOWN_DELAY=120s
+GPU_ACCELERATION=true
+GPU_MODELS_ALLOWLIST="llama3,deepseek-coder"
+
+# --- Private Telemetry ---
+TELEMETRY_MODE=local              # off | local | secure_remote
+ANON_STATS=true
+EXPORT_LOGS_ON_EXIT=true
+
+# --- Extensions ---
+PLUGIN_DIR="$HOME/Documents/Scripts/gptoss/extensions"
+ENABLE_PLUGINS=true
+PLUGIN_SECURITY_LEVEL=verified    # solo carga extensiones firmadas o internas
+
+# --- Home Assistant Integration ---
+HOME_ASSISTANT_ENABLED=true
+HOME_ASSISTANT_URL="http://192.168.3.33:8123"
+HOME_ASSISTANT_TOKEN="$HOME/.gptoss/hass_token"
+ENERGY_SENSOR_ENTITY="sensor.mac_power"
+TEMP_SENSOR_ENTITY="sensor.mac_temperature"
+AUTO_SHUTDOWN_THRESHOLD=90        # °C
+AUTO_WAKE_ON_ACTIVITY=true
+
+# --- Post-Build Automation ---
+AUTO_DEPLOY_SIMULATOR=true
+DEPLOY_DEVICE_NAME="iPhone 17 Pro"
+DEPLOY_SCHEME="Cortes"
+POST_BUILD_HOOK="$HOME/Documents/Scripts/gptoss/hooks/post_build.sh"
+AUTO_RUN_AFTER_BUILD=true
+AUTO_SCREENSHOT_ON_SUCCESS=true
+
+# --- AI Scheduler ---
+ENABLE_TASK_SCHEDULER=true
+SCHEDULE_INTERVAL=15m
+AGENT_POOL="swift_expert,builder_agent,ux_agent,watchdog"
+MAX_PARALLEL_AGENTS=3
+SCHEDULER_LOG="$HOME/Documents/Scripts/logs/scheduler.log"
+AUTO_RESUME_FAILED_TASKS=true

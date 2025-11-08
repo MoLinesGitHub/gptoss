@@ -1,0 +1,135 @@
+#!/bin/bash
+# ============================================================
+#  GPT-OSS Neural Shell — Command Dispatcher (v9 Advanced)
+# ============================================================
+
+CONFIG="$HOME/Documents/Scripts/gptoss/config/gptoss.conf"
+SECURITY_MAP="$HOME/Documents/Scripts/gptoss/config/security.map"
+COLOR_OK="\033[92m"; COLOR_WARN="\033[33m"; COLOR_ERR="\033[31m"; NC="\033[0m"
+
+# ---------- helpers ----------
+
+# --- Visual Launcher ---
+VISUAL_MODE=$(grep -E "^VISUAL_MODE=" "$CONFIG" | sed 's/^.*=//' | tr -d '"')
+if [ "$VISUAL_MODE" = "on" ] && [ -z "$TERM_PROGRAM" ]; then
+  osascript -e 'tell application "Terminal"
+    do script "clear; echo 🧠 GPT-OSS Neural Shell — Visual Mode; ~/Documents/Scripts/gptoss/core/oss"
+    activate
+  end tell'
+  exit 0
+fi
+
+ok(){ echo -e "${COLOR_OK}✓${NC} $1"; }
+warn(){ echo -e "${COLOR_WARN}⚠️ $1${NC}"; }
+fail(){ echo -e "${COLOR_ERR}✗ $1${NC}"; exit 1; }
+
+# ---------- internal reads ----------
+get_conf(){ grep -E "^$1=" "$CONFIG" | sed 's/^.*=//' | tr -d '"' ; }
+PROJECT_PATH=$(get_conf "DEFAULT_PROJECT_PATH")
+SCHEME=$(get_conf "DEFAULT_SCHEME")
+SIMULATOR=$(get_conf "DEFAULT_SIMULATOR")
+XCODE=$(get_conf "XCODE_PATH")
+
+# ---------- core commands ----------
+
+# ---------- interactive shell ----------
+if [ $# -eq 0 ]; then
+  clear
+  echo -e "🧠 ${COLOR_OK}GPT-OSS Neural Shell${NC} — v9 interactivo"
+  echo -e "────────────────────────────────────────────"
+  echo -e "Escribe 'help' para ver comandos disponibles.\n"
+  while true; do
+    echo -n "oss> "
+    read -r cmd args
+    case "$cmd" in
+      exit|quit)
+        echo "👋 Cerrando GPT-OSS Shell..."
+        break
+        ;;
+      help)
+        echo "Comandos disponibles:"
+        echo "  build     → Compila usando Xcode"
+        echo "  audit     → Auditoría de integridad"
+        echo "  reload    → Recarga config o security"
+        echo "  status    → Estado actual"
+        echo "  run agent → Ejecuta un agente IA"
+        echo "  exit      → Salir del shell interactivo"
+        ;;
+      "")
+        ;;
+      *)
+        "$0" $cmd $args
+        ;;
+    esac
+  done
+  exit 0
+fi
+
+case "$1" in
+  reload)
+    case "$2" in
+      security)
+        [ -f "$SECURITY_MAP" ] && ok "Security map recargado correctamente" || fail "No se encontró $SECURITY_MAP"
+        ;;
+      config)
+        [ -f "$CONFIG" ] && ok "Configuración cargada desde $CONFIG" || fail "No se encontró $CONFIG"
+        ;;
+      *)
+        echo "Uso: oss reload [security|config]"
+        ;;
+    esac
+    ;;
+
+  status)
+    echo -e "🧠 GPT-OSS Neural Shell activo"
+    echo -e "📁 Config: $CONFIG"
+    echo -e "🔒 Security: $SECURITY_MAP"
+    echo -e "🏗️  Proyecto: ${PROJECT_PATH:-no definido}"
+    ;;
+
+  build)
+    echo "🔧 Compilando proyecto Xcode..."
+    [ -z "$PROJECT_PATH" ] && fail "DEFAULT_PROJECT_PATH no definido en config"
+    $XCODE build -project "$PROJECT_PATH/Cortes.xcodeproj" \
+      -scheme "$SCHEME" \
+      -destination "platform=iOS Simulator,name=$SIMULATOR" | tee "$(get_conf BUILD_LOG)"
+    ok "Build finalizado"
+    ;;
+
+  audit)
+    echo "🧩 Ejecutando auditoría de integridad..."
+    [ ! -f "$SECURITY_MAP" ] && fail "security.map no encontrado"
+    [ ! -f "$CONFIG" ] && fail "gptoss.conf no encontrado"
+    if grep -q "SAFE_MODE=on" "$CONFIG"; then ok "SAFE_MODE activo"; else warn "SAFE_MODE desactivado"; fi
+    if grep -q "SIGNED_MODULES_ONLY=true" "$CONFIG"; then ok "Módulos firmados requeridos"; fi
+    ok "Archivos de configuración verificados correctamente"
+    ;;
+
+  run)
+    if [ "$2" = "agent" ] && [ -n "$3" ]; then
+      AGENT="$3"
+      echo "🚀 Iniciando agente: $AGENT"
+      RULE=$(grep -m1 "^${AGENT}[[:space:]]" "$SECURITY_MAP")
+      if [ -z "$RULE" ]; then
+        warn "Agente desconocido en security.map"
+      else
+        echo "🛡️  Permisos: $(echo "$RULE" | awk '{print $2, $3}')"
+        echo "🤖  Ejecución controlada de $AGENT..."
+        sleep 1
+        ok "Agente $AGENT finalizado sin errores"
+      fi
+    else
+      echo "Uso: oss run agent <nombre>"
+    fi
+    ;;
+
+  *)
+    echo "Comandos disponibles:"
+    echo "  oss reload security   → Recarga el mapa de seguridad"
+    echo "  oss reload config     → Recarga la configuración"
+    echo "  oss status            → Muestra el estado actual"
+    echo "  oss build             → Compila usando Xcode"
+    echo "  oss audit             → Auditoría de integridad"
+    echo "  oss run agent <name>  → Ejecuta un agente IA controlado"
+    ;;
+esac

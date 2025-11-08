@@ -1,13 +1,70 @@
-# agent     action         allow
-SwiftExpert code_read      yes
-SwiftExpert code_write     no
-SwiftExpert git_read       yes
-SwiftExpert git_write      no
-BuilderAgent build         yes
-BuilderAgent test          yes
-AnalyzerAgent log_read     yes
-AnalyzerAgent code_write   no
-UXAgent      assets_read   yes
-UXAgent      code_write    no
-MemoryAgent  memory_read   yes
-MemoryAgent  memory_write  yes
+# ============================================================
+#  GPT-OSS Security Map — v9.0
+#  Mapa de permisos jerárquico por agente
+# ============================================================
+
+# agent           action               allow / scope
+SwiftExpert       code_read            yes
+SwiftExpert       code_write           sandbox
+SwiftExpert       git_read             yes
+SwiftExpert       git_write            no
+SwiftExpert       ai_delegate          yes
+SwiftExpert       xcode_invoke         yes
+
+BuilderAgent      build                yes
+BuilderAgent      test                 yes
+BuilderAgent      deploy               no
+BuilderAgent      screenshot           yes
+BuilderAgent      simulator_control    yes
+
+AnalyzerAgent     log_read             yes
+AnalyzerAgent     code_audit           yes
+AnalyzerAgent     code_write           no
+AnalyzerAgent     metrics_collect      yes
+
+UXAgent           assets_read          yes
+UXAgent           ui_review            yes
+UXAgent           code_write           no
+UXAgent           theme_edit           sandbox
+
+MemoryAgent       memory_read          yes
+MemoryAgent       memory_write         yes
+MemoryAgent       encrypt_access       yes
+
+SecurityAgent     firewall_reload      yes
+SecurityAgent     audit                yes
+SecurityAgent     verify_signatures    yes
+SecurityAgent     block_command        yes
+SecurityAgent     key_rotation         manual
+
+DeployAgent       deploy_simulator     yes
+DeployAgent       deploy_device        yes
+DeployAgent       rollback             yes
+DeployAgent       post_build_hook      yes
+DeployAgent       remote_backup        yes
+
+SchedulerAgent    task_schedule        yes
+SchedulerAgent    agent_spawn          yes
+SchedulerAgent    agent_kill           sandbox
+SchedulerAgent    health_monitor       yes
+SchedulerAgent    self_repair          smart
+
+VoiceAgent        tts_output           yes
+VoiceAgent        alerts_voice         yes
+VoiceAgent        ai_read_memory       no
+VoiceAgent        system_summary       yes
+
+HomeAgent         home_monitor         yes
+HomeAgent         home_control         sandbox
+HomeAgent         temp_read            yes
+HomeAgent         shutdown_trigger     yes
+
+NetworkAgent      sync_nas             yes
+NetworkAgent      sync_pi              yes
+NetworkAgent      sync_remote          yes
+NetworkAgent      cluster_status       yes
+
+TelemetryAgent    stats_collect        yes
+TelemetryAgent    export_local         yes
+TelemetryAgent    export_remote        no
+TelemetryAgent    anonymize            yes
