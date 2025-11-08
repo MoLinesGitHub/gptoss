@@ -1,0 +1,13 @@
+# agent     action         allow
+SwiftExpert code_read      yes
+SwiftExpert code_write     no
+SwiftExpert git_read       yes
+SwiftExpert git_write      no
+BuilderAgent build         yes
+BuilderAgent test          yes
+AnalyzerAgent log_read     yes
+AnalyzerAgent code_write   no
+UXAgent      assets_read   yes
+UXAgent      code_write    no
+MemoryAgent  memory_read   yes
+MemoryAgent  memory_write  yes
