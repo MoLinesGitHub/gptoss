@@ -1,7 +1,4 @@
 # --- GPT-OSS Git Ignore ---
-logs/
-backups/
-data/
 *.log
 *.bak
 *.tar.gz
