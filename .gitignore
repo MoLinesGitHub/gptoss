@@ -6,5 +6,10 @@
 *.swp
 *.tmp
 *.key
+*.pid
 .security_hash
 .DS_Store
+logs/
+backups/
+tmp/
+core/.DS_Store
