@@ -7,3 +7,4 @@
 *.tmp
 *.key
 .security_hash
+.DS_Store
